@@ -25,13 +25,13 @@ abstract contract ERC2612 is ERC20, IERC20Permit, EIP712 {
     function permit(
         address owner,
         address spender,
-        uint256 value,
-        uint256 deadline,
+        uint value,
+        uint deadline,
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external {
-        require(deadline >= block.timestamp, "ERC20Permit: Signature expired");
+    ) external virtual {
+        require(block.timestamp <= deadline, "ERC20Permit: Signature expired");
 
         bytes32 structHash = keccak256(
             abi.encode(
@@ -56,7 +56,7 @@ abstract contract ERC2612 is ERC20, IERC20Permit, EIP712 {
     /**
      * @dev See {IERC20Permit-nonces()}
      */
-    function nonces(address owner) external view returns (uint256) {
+    function nonces(address owner) external view returns (uint) {
         return _nonces[owner];
     }
 
@@ -67,8 +67,8 @@ abstract contract ERC2612 is ERC20, IERC20Permit, EIP712 {
         return _domainSeparatorV4();
     }
 
-    function _useNonce(address owner) internal virtual returns (uint nonce) {
-        nonce = _nonces[owner];
+    function _useNonce(address owner) internal virtual returns (uint current) {
+        current = _nonces[owner];
 
         _nonces[owner]++;
     }
